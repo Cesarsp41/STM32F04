@@ -23,6 +23,31 @@
 
 #define __vo		volatile
 
+/*********************** ARM CORTEX M4 Processor Specific Macros*************************
+ *
+ *
+ * NVIC Base Address Macros,
+ *
+ *
+ *
+ *
+ **/
+
+#define			NVIC_ISER0			((__vo uint32_t*)0xE000E100)
+#define			NVIC_ISER1			((__vo uint32_t*)0xE000E104)
+#define			NVIC_ISER2			((__vo uint32_t*)0xE000E108)
+#define			NVIC_ISER3			((__vo uint32_t*)0xE000E10C)
+
+
+#define			NVIC_ICER0			((__vo uint32_t*)0xE000E100)
+#define			NVIC_ICER1			((__vo uint32_t*)0xE000E104)
+#define			NVIC_ICER2			((__vo uint32_t*)0xE000E108)
+#define			NVIC_ICER3			((__vo uint32_t*)0xE000E10C)
+
+
+
+
+
 /*
  * Macro definitions for addressable memory locations
  *
@@ -304,10 +329,8 @@ typedef struct
 
 	__vo uint32_t MEMRMP;				//SYSCFG memory remap register
 	__vo uint32_t PMC;					//SYSCFG peripheral mode configuration register
-	__vo uint32_t EXTICR1;				//SYSCFG external interrupt configuration register 1
-	__vo uint32_t EXTICR2;				//SYSCFG external interrupt configuration register 2
-	__vo uint32_t EXTICR3;				//SYSCFG external interrupt configuration register 3
-	__vo uint32_t EXTICR4;				//SYSCFG external interrupt configuration register 4
+	__vo uint32_t EXTICR[4];				//SYSCFG external interrupt configuration register
+	__vo uint32_t RESERVED[2];
 	__vo uint32_t CMPCR;				//Compensation cell control register
 
 
@@ -361,6 +384,7 @@ typedef struct
 
 #define		RCC				((RCC_RegDef_t*)RCC_BASE)	//RCC is a pointer to the RCC Register Structure
 #define		EXTI			((EXTI_RegDef_t*)EXTI_BASE)
+#define		SYSCFG			((SYSCFG_RegDef_t*)SYSCFG_BASE)
 
 #define 	GPIOA			((GPIO_RegDef_t*)GPIOA_BASE)//GPIOA is a pointer to the GPIOA Register Structure
 #define 	GPIOB			((GPIO_RegDef_t*)GPIOB_BASE)
@@ -440,6 +464,12 @@ typedef struct
 #define			SPI4_PCLK_EN()			(RCC->APB2ENR |= (1 << 14))
 
 
+/*
+ * SYSCFG Clock enable macros
+ * */
+
+#define			SYSCFG_PCLK_EN()		(RCC->APB2ENR |= (1 << 14))
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -502,7 +532,111 @@ typedef struct
 #define			GPIOI_REG_RESET()	do{(RCC->AHB1RSTR |= (1 << 8)); (RCC->AHB1RSTR &= ~(1 << 8));} while(0)
 
 
+#define 		GPIO_BASE_TO_CODE(x)   ((x == GPIOA) ? 0 : \
+										(x == GPIOB) ? 1 : \
+										(x == GPIOC) ? 2 : \
+										(x == GPIOD) ? 3 : \
+										(x == GPIOE) ? 4 : \
+										(x == GPIOF) ? 5 : \
+										(x == GPIOG) ? 6 : \
+										(x == GPIOH) ? 7 : 0 )
+
+
+/****
+ *
+ *
+ *
+ * 		IRQ Macro definitions
+ *
+ *
+ *
+ *
+ * ***/
+
+#define			IRQ_WWDG						0
+#define			IRQ_PVD							1
+#define			IRQ_TAMP_STAMP					2
+#define			IRQ_RTC_WKUP					3
+#define			IRQ_FLASH						4
+#define			IRQ_RCC							5
+#define			IRQ_EXTI0						6
+#define			IRQ_EXTI1						7
+#define			IRQ_EXTI2						8
+#define			IRQ_EXTI3						9
+#define			IRQ_EXTI4						10
+#define			IRQ_DMA1_Stream0				11
+#define			IRQ_DMA1_Stream1				12
+#define			IRQ_DMA1_Stream2				13
+#define			IRQ_DMA1_Stream3				14
+#define			IRQ_DMA1_Stream4				15
+#define			IRQ_DMA1_Stream5				16
+#define			IRQ_DMA1_Stream6				17
+#define			IRQ_ADC							18
+#define			IRQ_CAN1_TX						19
+#define			IRQ_CAN1_RX0					20
+#define			IRQ_CAN1_RX1					21
+#define			IRQ_CAN1_SCE					22
+#define			IRQ_EXTI9_5						23
+#define			IRQ_TIM1_BRK_TIM9				24
+#define			IRQ_TIM1_UP_TIM10				25
+#define			IRQ_TIM1_TRG_COM_TIM11			26
+#define			IRQ_TIM1_CC						27
+#define			IRQ_TIM2						28
+#define			IRQ_TIM3						29
+#define			IRQ_TIM4						30
+#define			IRQ_I2C1_EV						31
+#define			IRQ_I2C1_ER						32
+#define			IRQ_I2C2_EV						33
+#define			IRQ_I2C2_ER						34
+#define			IRQ_SPI1						35
+#define			IRQ_SPI2						36
+#define			IRQ_USART1						37
+#define			IRQ_USART2						38
+#define			IRQ_USART3						39
+#define			IRQ_EXTI15_10					40
+#define			IRQ_RTC_Alarm					41
+#define			IRQ_OTG_FS_WKUP					42
+#define			IRQ_TIM8_BRK_TIM12				43
+#define			IRQ_TIM8_UP_TIM13				44
+#define			IRQ_TIM8_TRG_COM_TIM14			45
+#define			IRQ_TIM8_CC						46
+#define			IRQ_DMA1_Stream7				47
+#define			IRQ_FSMC						48
+#define			IRQ_SDIO						49
+#define			IRQ_TIM5						50
+#define			IRQ_SPI3						51
+#define			IRQ_UART4						52
+#define			IRQ_UART5						53
+#define			IRQ_TIM6_DAC					54
+#define			IRQ_TIM7						55
+#define			IRQ_DMA2_Stream0				56
+#define			IRQ_DMA2_Stream1				57
+#define			IRQ_DMA2_Stream2				58
+#define			IRQ_DMA2_Stream3				59
+#define			IRQ_DMA2_Stream4				60
+#define			IRQ_ETH							61
+#define			IRQ_ETH_WKUP					62
+#define			IRQ_CAN2_TX						63
+#define			IRQ_CAN2_RX0					64
+#define			IRQ_CAN2_RX1					65
+#define			IRQ_CAN2_SCE					66
+#define			IRQ_OTG_FS						67
+#define			IRQ_DMA2_Stream5				68
+#define			IRQ_DMA2_Stream6				69
+#define			IRQ_DMA2_Stream7				70
+#define			IRQ_USART6						71
+#define			IRQ_I2C3_EV						72
+#define			IRQ_I2C3_ER						73
+#define			IRQ_OTG_HS_EP1_OUT				74
+#define			IRQ_OTG_HS_EP1_IN				75
+#define			IRQ_OTG_HS_WKUP					76
+#define			IRQ_OTG_HS						77
+#define			IRQ_DCMI						78
+#define			IRQ_CRYP						79
+#define			IRQ_HASH_RNG					80
+#define			IRQ_FPU							81
+
+
+
 #include "STM32F407_GPIO_Drivers.h"
-
-
 #endif /* INC_STM32F407_H_*/

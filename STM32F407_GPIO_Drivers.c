@@ -119,6 +119,16 @@ void GPIO_Init (GPIO_Handle_t *pGPIOHandle)
 			EXTI->RTSR |= (1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
 		}
 
+		//Habilitar la interrupción EXTI
+		EXTI->IMR |= (1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+
+		//Configurar SYSCFG para especificar el puerto
+		uint8_t temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber / 4;
+		uint8_t temp2 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber % 4;
+		uint8_t portCode = GPIO_BASE_TO_CODE(pGPIOHandle->pGPIOx);
+		SYSCFG_PCLK_EN();
+		SYSCFG->EXTICR[temp1] |= portCode << (temp2 * 4);
+
 	}
 
 
@@ -359,7 +369,51 @@ void GPIO_OPConfig (GPIO_RegDef_t *pGPIOx, uint8_t PinNumber)
 void GPIO_IRQConfig (uint8_t IRQNumber, uint8_t EN_DI, uint8_t IRQPriority)
 {
 
-
+	/*
+	 *
+	 *
+	 * Aquí se activan las interrupciones en NVIC. Por lo tanto debe
+	 * consultarse el manual del procesador (NVIC es parte del procesador)
+	 * y no del MCU
+	 *
+	 *
+	 * */
+	if (EN_DI == ENABLE)
+	{
+		if (IRQNumber <= 31)
+		{
+			//Programar ISER0 Register
+			*NVIC_ISER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber > 31 && IRQNumber < 64)
+		{
+			//Programar ISER1 Register
+			*NVIC_ISER1 |= (1 << IRQNumber % 32);
+		}
+		else if (IRQNumber >= 64 && IRQNumber < 96)
+		{
+			//Programar ISER2 register
+			*NVIC_ISER3 |= (1 << IRQNumber % 64);
+		}
+	}
+	else
+	{
+		if (IRQNumber <= 31)
+		{
+			//Programar ICER0 Register
+			*NVIC_ICER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber > 31 && IRQNumber < 64)
+		{
+			//Programar ICER1 Register
+			*NVIC_ICER1 |= (1 << IRQNumber % 32);
+		}
+		else if (IRQNumber >= 64 && IRQNumber < 96)
+		{
+			//Programar ICER2 register
+			*NVIC_ICER3 |= (1 << IRQNumber % 64);
+		}
+	}
 
 }
 
