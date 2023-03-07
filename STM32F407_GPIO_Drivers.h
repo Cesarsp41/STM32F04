@@ -115,8 +115,9 @@ uint16_t GPIO_ReadPort (GPIO_RegDef_t *pGPIOx); //Reads from 16 Long port
 void GPIO_OPConfig (GPIO_RegDef_t *pGPIOx, uint8_t PinNumber); //Tipo de salida
 
 //Interrupt hadle
-void GPIO_IRQConfig (uint8_t IRQNumber, uint8_t EN_DI, uint8_t IRQPriority);
+void GPIO_IRQConfig (uint8_t IRQNumber, uint8_t EN_DI);
 void GPIO_IRQHandle (uint8_t PinNumber);
+void GPIO_IQRPriorityConfig (uint8_t IRQPriority, uint8_t IRQNumber);
 
 
 

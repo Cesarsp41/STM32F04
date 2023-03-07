@@ -366,7 +366,7 @@ void GPIO_OPConfig (GPIO_RegDef_t *pGPIOx, uint8_t PinNumber)
  * */
 
 
-void GPIO_IRQConfig (uint8_t IRQNumber, uint8_t EN_DI, uint8_t IRQPriority)
+void GPIO_IRQConfig (uint8_t IRQNumber, uint8_t EN_DI)
 {
 
 	/*
@@ -414,6 +414,37 @@ void GPIO_IRQConfig (uint8_t IRQNumber, uint8_t EN_DI, uint8_t IRQPriority)
 			*NVIC_ICER3 |= (1 << IRQNumber % 64);
 		}
 	}
+
+}
+
+
+/*************************************************************
+ *
+ * @Function					GPIO_IQRPriorityConfig
+ *
+ * @Description					Priority set for IRQ.
+ *
+ *
+ * @param[IRQPriority]			Priority level
+ *
+ * @param[IRQNumber]			IRQ Number
+ *
+ * @return						void
+ *
+ * @Note						none
+ *
+ * */
+
+
+void GPIO_IQRPriorityConfig (uint8_t IRQPriority, uint8_t IRQNumber)
+{
+
+	//Encontrar el registro IPR
+	uint8_t iprx = IRQNumber / 4;
+	uint8_t iprx_section = IRQNumber % 4;
+
+	uint8_t shift = (8 * iprx_section) + (8 - 4);
+	*(NVIC_PR_BASE + (iprx * 4)) |= (IRQPriority << shift);
 
 }
 

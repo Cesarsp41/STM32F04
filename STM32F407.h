@@ -44,7 +44,7 @@
 #define			NVIC_ICER2			((__vo uint32_t*)0xE000E108)
 #define			NVIC_ICER3			((__vo uint32_t*)0xE000E10C)
 
-
+#define			NVIC_PR_BASE		((__vo uint32_t*)0xE000E400)
 
 
 
