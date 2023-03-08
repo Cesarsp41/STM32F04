@@ -639,4 +639,6 @@ typedef struct
 
 
 #include "STM32F407_GPIO_Drivers.h"
+#include "STM32F407_SPI_Drivers.h"
+
 #endif /* INC_STM32F407_H_*/
