@@ -94,6 +94,14 @@
 
 /*
  *
+ *  SPI FLAGS MACROS
+ *
+ * */
+
+#define SPI_TXE_FLAG 	(1 << SPI_SR_TXE)
+
+/*
+ *
  * 		SPI Configuration Structure
  *
  * */

@@ -80,10 +80,7 @@ void SPI_Init (SPI_Handle_t *pSPIHandle)
 	 *
 	 * */
 
-	temp |= (pSPIHandle->SPIConfig.SPI_DeviceMode << 2);
-
-
-
+	temp |= (pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR);
 
 
 	/*
@@ -118,16 +115,16 @@ void SPI_Init (SPI_Handle_t *pSPIHandle)
 
 	if (pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUSCONFIG_FD)
 	{
-		temp &= ~(1 << 15);
+		temp &= ~(1 << SPI_CR1_BIDIMODE);
 	}
 	else if (pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUSCONFIG_HD)
 	{
-		temp |= (1 << 15);
+		temp |= (1 << SPI_CR1_BIDIMODE);
 	}
 	else if (pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUSCONFIG_SIMPLEX_RXONLY)
 	{
-		temp &= ~(1 << 15);
-		temp |= (1 << 10);
+		temp &= ~(1 << SPI_CR1_BIDIMODE);
+		temp |= (1 << SPI_CR1_RXONLY);
 	}
 
 
@@ -141,7 +138,7 @@ void SPI_Init (SPI_Handle_t *pSPIHandle)
 	 *
 	 * */
 
-
+	temp |= (pSPIHandle->SPIConfig.SPI_DFF << SPI_CR1_DFF);
 
 	/*
 	 * 4- CPHA
@@ -152,6 +149,8 @@ void SPI_Init (SPI_Handle_t *pSPIHandle)
 	 * CPHA = 1 Datos capturados en bajada, datos leidos en subida
 	 *
 	 * */
+
+	temp |= (pSPIHandle->SPIConfig.SPI_DFF << SPI_CR1_CPHA);
 
 
 	/*
@@ -164,6 +163,10 @@ void SPI_Init (SPI_Handle_t *pSPIHandle)
 	 *
 	 * */
 
+
+	temp |= (pSPIHandle->SPIConfig.SPI_DFF << SPI_CR1_CPOL);
+
+
 	/*
 	 * 6- SSM
 	 *
@@ -174,30 +177,58 @@ void SPI_Init (SPI_Handle_t *pSPIHandle)
 	 *
 	 * */
 
+	temp |= (pSPIHandle->SPIConfig.SPI_DFF << SPI_CR1_SSM);
 
+	/*
+	 *
+	 * 7- SPI Speed Clock
+	 *
+	 * This is done through SPI Control Register 1
+	 *
+	 * BR Bit
+	 *
+	 * */
+
+	temp |= (pSPIHandle->SPIConfig.SPI_Speed << SPI_CR1_BR);
+
+
+	//Equal CR1 to all bits in temp
+	//No need to clear bits since temp was = 0
+
+	pSPIHandle->pSPIx->CR1 = temp;
 
 
 }
 
 /*************************************************************
  *
- * @Function
+ * @Function				SPI_DeInit
  *
- * @Description
+ * @Description				This function uses RCC SPI Register Reset. Function uses SPIx_REG_RESET() defined in MCU.h
  *
- * @param[]
+ * @param[pSPIx]			Access to SPIx Base address
  *
- * @param[]
+ * @return					void
  *
- * @return
- *
- * @Note
+ * @Note					none
  *
  * */
 
 void SPI_DeInit (SPI_RegDef_t *pSPIx)
 {
+	if (pSPIx == SPI1) SPI1_REG_RESET();
+	else if (pSPIx == SPI2) SPI2_REG_RESET();
+	else if (pSPIx == SPI3) SPI3_REG_RESET();
 
+}
+
+
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName)
+{
+	if (pSPIx->SR & FlagName)
+		return FLAG_SET;
+
+	return FLAG_RESET;
 }
 
 /*************************************************************
@@ -218,7 +249,17 @@ void SPI_DeInit (SPI_RegDef_t *pSPIx)
 
 void SPI_SendData (SPI_RegDef_t *pSPIx, uint8_t *pTXBuffer, uint32_t lenght)
 {
+	while (lenght > 0)
+	{
+		// 1- Esperar a que TX se encuentre vacio TXE = 1
+		while (SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET );
 
+
+
+
+
+
+	}
 }
 
 /*************************************************************
